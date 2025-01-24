@@ -1,6 +1,6 @@
 class Session:
     def __init__(self):
-        self.user = None     
+        self.user = None
 
     def set_user(self, user):
         """Setzt den aktuellen Benutzer."""
