@@ -1,14 +1,24 @@
 from sqlalchemy.orm import Session
 from models.db_context import get_db
 from models.product import Product
+from typing import List, Optional
+
 
 class ProductController:
     @staticmethod
-    def create_product(name, description, price):
+    def create_product(
+        name: str,
+        description: str,
+        price: float
+    ) -> Optional[Product]:
         """Erstellt ein neues Produkt."""
         db: Session = next(get_db())
         try:
-            new_product = Product(name=name, description=description, price=price)
+            new_product = Product(
+                name=name,
+                description=description,
+                price=price
+            )
             db.add(new_product)
             db.commit()
             db.refresh(new_product)
@@ -21,7 +31,7 @@ class ProductController:
             db.close()
 
     @staticmethod
-    def get_all_products():
+    def get_all_products() -> List[Product]:
         """Gibt alle Produkte zurück."""
         db: Session = next(get_db())
         try:
@@ -33,7 +43,7 @@ class ProductController:
             db.close()
 
     @staticmethod
-    def get_product_by_id(product_id):
+    def get_product_by_id(product_id: int) -> Optional[Product]:
         """Gibt ein Produkt basierend auf der ID zurück."""
         db: Session = next(get_db())
         try:
@@ -45,11 +55,20 @@ class ProductController:
             db.close()
 
     @staticmethod
-    def update_product(product_id, name=None, description=None, price=None):
+    def update_product(
+        product_id: int,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        price: Optional[float] = None
+    ) -> Optional[Product]:
         """Aktualisiert ein bestehendes Produkt."""
         db: Session = next(get_db())
         try:
-            product = db.query(Product).filter(Product.id == product_id).first()
+            product = (
+                db.query(Product)
+                .filter(Product.id == product_id)
+                .first()
+            )
             if not product:
                 print("Produkt nicht gefunden.")
                 return None
@@ -72,11 +91,15 @@ class ProductController:
             db.close()
 
     @staticmethod
-    def delete_product(product_id):
+    def delete_product(product_id: int) -> bool:
         """Löscht ein Produkt basierend auf der ID."""
         db: Session = next(get_db())
         try:
-            product = db.query(Product).filter(Product.id == product_id).first()
+            product = (
+                db.query(Product)
+                .filter(Product.id == product_id)
+                .first()
+            )
             if not product:
                 print("Produkt nicht gefunden.")
                 return False

@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
 from models.db_context import get_db
 from models.role import Role
+from typing import List, Optional
+
 
 class RoleController:
     @staticmethod
-    def get_all_roles():
+    def get_all_roles() -> List[Role]:
         """Gibt alle Rollen in der Datenbank zurück."""
         db: Session = next(get_db())
         try:
@@ -16,7 +18,7 @@ class RoleController:
             db.close()
 
     @staticmethod
-    def get_role_by_id(role_id):
+    def get_role_by_id(role_id: int) -> Optional[Role]:
         """Gibt eine Rolle basierend auf ihrer ID zurück."""
         db: Session = next(get_db())
         try:
