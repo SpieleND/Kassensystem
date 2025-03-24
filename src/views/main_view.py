@@ -1,5 +1,6 @@
 from tkinter import Tk, Frame
 
+import os
 from views.components.admin_menu import AdminMenu
 from views.components.role_display import RoleDisplay
 
@@ -8,7 +9,7 @@ class MainView:
         self.session = session
         self.root = Tk()
         self.root.title("Komponentenbasierte View")
-        self.root.geometry("400x300")
+        self.root.geometry(os.getenv("DISPLAY_RESOLUTION"))
 
         # Initialer Bereich (Frame)
         self.main_frame = Frame(self.root)
