@@ -25,7 +25,10 @@ class ProductManagement:
         self.product_listbox.delete(0, "end")  # Liste leeren
         products = ProductController.get_all_products()
         for product in products:
-            self.product_listbox.insert("end", f"{product.id}: {product.name} - {product.price} €")
+            self.product_listbox.insert(
+                "end",
+                f"{product.id}: {product.name} - {product.price} € (Erstellt von: {product.created_by})"
+            )
 
     def add_product(self):
         """Öffnet ein Dialogfenster zum Hinzufügen eines Produkts."""
@@ -41,7 +44,11 @@ class ProductManagement:
         product = ProductController.get_product_by_id(product_id)
 
         if product:
-            self._show_product_dialog("Produkt bearbeiten", lambda name, price: self._update_product(product.id, name, price), product)
+            self._show_product_dialog(
+                "Produkt bearbeiten",
+                lambda name, price: self._update_product(product.id, name, price),
+                product
+            )
 
     def delete_product(self):
         """Löscht das ausgewählte Produkt."""
@@ -50,7 +57,7 @@ class ProductManagement:
             return
 
         product_id = int(selected.split(":")[0])  # ID aus der Auswahl extrahieren
-        success = ProductController.delete_product(product_id)
+        success = ProductController.delete_product(product_id, deleted_by="Admin")  # Replace "Admin" with the actual user
         if success:
             self.load_products()
 
@@ -94,8 +101,8 @@ class ProductManagement:
 
     def _create_product(self, name, price):
         """Erstellt ein neues Produkt."""
-        ProductController.create_product(name, price)
+        ProductController.create_product(name, price, created_by="Admin")  # Replace "Admin" with the actual user
 
     def _update_product(self, product_id, name, price):
         """Aktualisiert ein bestehendes Produkt."""
-        ProductController.update_product(product_id, name, price)
+        ProductController.update_product(product_id, name, price, updated_by="Admin")  # Replace "Admin" with the actual user

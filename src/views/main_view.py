@@ -11,17 +11,13 @@ class MainView:
         self.root.title("Komponentenbasierte View")
         self.root.geometry(os.getenv("DISPLAY_RESOLUTION"))
 
-        # Initialer Bereich (Frame)
         self.main_frame = Frame(self.root)
         self.main_frame.pack(fill="both", expand=True)
 
-        # Standardrolle anzeigen
         self.role_display = RoleDisplay(self.main_frame, session)
 
-        # Admin-Menü wird dynamisch hinzugefügt
         self.admin_menu = None
 
-        # Tastatureingabe binden
         self.root.bind("<l>", self.enter_admin_mode)
 
     def enter_admin_mode(self, event=None):

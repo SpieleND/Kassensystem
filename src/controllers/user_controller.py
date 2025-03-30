@@ -9,7 +9,8 @@ class UserController:
     def create_user(
         username: str,
         rfid_key: Optional[str],
-        role_id: int
+        role_id: int,
+        created_by: str
     ) -> Optional[User]:
         """
         Erstellt einen neuen Benutzer.
@@ -17,6 +18,7 @@ class UserController:
         :param username: Der Benutzername.
         :param rfid_key: Der optionale RFID-Schlüssel.
         :param role_id: Die ID der Rolle.
+        :param created_by: Der Benutzer, der diesen Benutzer erstellt hat.
         :return: Das erstellte User-Objekt oder None bei Fehlern.
         """
         db: Session = next(get_db())
@@ -24,7 +26,9 @@ class UserController:
             new_user = User(
                 username=username,
                 rfid_key=rfid_key,
-                role_id=role_id
+                role_id=role_id,
+                created_by=created_by,
+                updated_by=created_by  # Initially set to the creator
             )
             db.add(new_user)
             db.commit()
@@ -40,13 +44,13 @@ class UserController:
     @staticmethod
     def get_all_users() -> List[User]:
         """
-        Gibt alle Benutzer zurück.
+        Gibt alle Benutzer zurück, die nicht gelöscht wurden.
 
         :return: Eine Liste von User-Objekten.
         """
         db: Session = next(get_db())
         try:
-            return db.query(User).all()
+            return db.query(User).filter(User.is_deleted == False).all()
         except Exception as e:
             print(f"Fehler beim Abrufen der Benutzer: {e}")
             return []
@@ -64,7 +68,7 @@ class UserController:
         """
         db: Session = next(get_db())
         try:
-            return db.query(User).filter(User.id == user_id).first()
+            return db.query(User).filter(User.id == user_id, User.is_deleted == False).first()
         except Exception as e:
             print(f"Fehler beim Abrufen des Benutzers mit ID {user_id}: {e}")
             return None
@@ -82,7 +86,7 @@ class UserController:
         """
         db: Session = next(get_db())
         try:
-            return db.query(User).filter(User.username == username).first()
+            return db.query(User).filter(User.username == username, User.is_deleted == False).first()
         except Exception as e:
             print(f"Fehler beim Abrufen des Benutzers mit Benutzernamen '{username}': {e}")  # noqa: E501
             return None
@@ -90,18 +94,19 @@ class UserController:
             db.close()
 
     @staticmethod
-    def update_user(user_id: int, **kwargs) -> Optional[User]:
+    def update_user(user_id: int, updated_by: str, **kwargs) -> Optional[User]:
         """
         Aktualisiert die Daten eines Benutzers.
 
         :param user_id: Die ID des Benutzers.
+        :param updated_by: Der Benutzer, der die Änderungen vorgenommen hat.
         :param kwargs: Zu aktualisierende Felder (z. B. username, rfid_key).
         :return: Das aktualisierte User-Objekt oder None, falls der Benutzer
                  nicht gefunden wurde.
         """
         db: Session = next(get_db())
         try:
-            user = db.query(User).filter(User.id == user_id).first()
+            user = db.query(User).filter(User.id == user_id, User.is_deleted == False).first()
             if not user:
                 print(f"Benutzer mit ID {user_id} nicht gefunden.")
                 return None
@@ -110,6 +115,7 @@ class UserController:
                 if hasattr(user, key):
                     setattr(user, key, value)
 
+            user.updated_by = updated_by  # Update the updated_by field
             db.commit()
             db.refresh(user)
             return user
@@ -121,22 +127,24 @@ class UserController:
             db.close()
 
     @staticmethod
-    def delete_user(user_id: int) -> bool:
+    def delete_user(user_id: int, deleted_by: str) -> bool:
         """
-        Löscht einen Benutzer basierend auf seiner ID.
+        Markiert einen Benutzer als gelöscht.
 
         :param user_id: Die ID des Benutzers.
+        :param deleted_by: Der Benutzer, der die Löschung vorgenommen hat.
         :return: True, wenn der Benutzer erfolgreich
                  gelöscht wurde, sonst False.
         """
         db: Session = next(get_db())
         try:
-            user = db.query(User).filter(User.id == user_id).first()
+            user = db.query(User).filter(User.id == user_id, User.is_deleted == False).first()
             if not user:
                 print(f"Benutzer mit ID {user_id} nicht gefunden.")
                 return False
 
-            db.delete(user)
+            user.is_deleted = True
+            user.updated_by = deleted_by  # Update the updated_by field
             db.commit()
             return True
         except Exception as e:
