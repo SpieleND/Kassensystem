@@ -8,7 +8,6 @@ class ProductController:
     @staticmethod
     def create_product(
         name: str,
-        description: str,
         price: float
     ) -> Optional[Product]:
         """Erstellt ein neues Produkt."""
@@ -16,7 +15,6 @@ class ProductController:
         try:
             new_product = Product(
                 name=name,
-                description=description,
                 price=price
             )
             db.add(new_product)
@@ -58,7 +56,6 @@ class ProductController:
     def update_product(
         product_id: int,
         name: Optional[str] = None,
-        description: Optional[str] = None,
         price: Optional[float] = None
     ) -> Optional[Product]:
         """Aktualisiert ein bestehendes Produkt."""
@@ -75,8 +72,6 @@ class ProductController:
 
             if name:
                 product.name = name
-            if description:
-                product.description = description
             if price is not None:
                 product.price = price
 

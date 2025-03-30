@@ -41,7 +41,7 @@ class ProductManagement:
         product = ProductController.get_product_by_id(product_id)
 
         if product:
-            self._show_product_dialog("Produkt bearbeiten", lambda name, desc, price: self._update_product(product.id, name, desc, price), product)
+            self._show_product_dialog("Produkt bearbeiten", lambda name, price: self._update_product(product.id, name, price), product)
 
     def delete_product(self):
         """Löscht das ausgewählte Produkt."""
@@ -70,37 +70,32 @@ class ProductManagement:
         Label(dialog, text="Name:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         name_entry = Entry(dialog, width=30)
         name_entry.grid(row=0, column=1, padx=5, pady=5)
-        Label(dialog, text="Beschreibung:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
-        desc_entry = Entry(dialog, width=30)
-        desc_entry.grid(row=1, column=1, padx=5, pady=5)
-        Label(dialog, text="Preis:").grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        Label(dialog, text="Preis:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
         price_entry = Entry(dialog, width=30)
-        price_entry.grid(row=2, column=1, padx=5, pady=5)
+        price_entry.grid(row=1, column=1, padx=5, pady=5)
 
         if product:
             name_entry.insert(0, product.name)
-            desc_entry.insert(0, product.description)
             price_entry.insert(0, str(product.price))
 
         def submit():
             name = name_entry.get()
-            description = desc_entry.get()
             try:
                 price = float(price_entry.get())
             except ValueError:
                 print("Ungültiger Preis.")
                 return
 
-            on_submit(name, description, price)
+            on_submit(name, price)
             dialog.destroy()
             self.load_products()
 
-        Button(dialog, text="Speichern", command=submit).grid(row=3, column=0, columnspan=2, pady=10)
+        Button(dialog, text="Speichern", command=submit).grid(row=2, column=0, columnspan=2, pady=10)
 
-    def _create_product(self, name, description, price):
+    def _create_product(self, name, price):
         """Erstellt ein neues Produkt."""
-        ProductController.create_product(name, description, price)
+        ProductController.create_product(name, price)
 
-    def _update_product(self, product_id, name, description, price):
+    def _update_product(self, product_id, name, price):
         """Aktualisiert ein bestehendes Produkt."""
-        ProductController.update_product(product_id, name, description, price)
+        ProductController.update_product(product_id, name, price)

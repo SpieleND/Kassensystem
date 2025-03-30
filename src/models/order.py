@@ -7,8 +7,8 @@ from .metadata import Metadata
 class Order(Base, Metadata):
     __tablename__ = "orders"
 
-    user_id = Column(Integer, ForeignKey("users.id"))
-    product_id = Column(Integer, ForeignKey("products.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     quantity = Column(Integer, nullable=False)
 
     user = relationship("User", back_populates="orders")

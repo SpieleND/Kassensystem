@@ -12,3 +12,4 @@ class User(Base, Metadata):
     rfid_key = Column(String(255), unique=True)
 
     role = relationship("Role", back_populates="users")
+    orders = relationship("Order", back_populates="user")

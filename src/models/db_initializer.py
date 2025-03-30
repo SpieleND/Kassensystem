@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from models.db_context import engine, Base, get_db
 from models.role import Role
 from models.user import User
+from models.product import Product
+from models.order import Order
 
 
 def ensure_database_exists():
