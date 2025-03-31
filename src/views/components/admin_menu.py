@@ -2,7 +2,7 @@ from tkinter import Frame, Button
 from views.components.product_management import ProductManagement
 
 class AdminMenu:
-    def __init__(self, parent, session, logout_callback):
+    def __init__(self, parent, logout_callback):
         """Initialisiert das Admin-Menü."""
         self.frame = Frame(parent)
         self.frame.pack(fill="both", expand=True)

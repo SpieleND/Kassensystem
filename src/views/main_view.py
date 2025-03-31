@@ -1,6 +1,6 @@
 from tkinter import Tk, Frame
 import os
-from utils import ROLES, session  # Import the global session
+from utils import ROLES, session
 from views.admin_view import AdminView
 
 
@@ -14,7 +14,7 @@ class MainView:
         self.main_frame = Frame(self.root)
         self.main_frame.pack(fill="both", expand=True)
 
-        self.admin_view = AdminView(self.main_frame, session, self.logout)
+        self.admin_view = AdminView(self.main_frame, self.logout)
 
         # Standardansicht anzeigen
         self.admin_view.show_role_display()
