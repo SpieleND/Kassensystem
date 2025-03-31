@@ -1,9 +1,26 @@
+from enum import Enum
 from sqlalchemy.orm import Session
 from models.db_context import engine, Base, get_db
 from models.role import Role
 from models.user import User
 from models.product import Product
 from models.order import Order
+
+
+class RoleEnum(Enum):
+    SYSTEM = "system"
+    ADMIN = "admin"
+    USER = "user"
+    GUEST = "guest"
+
+
+roles_to_create = {role.value for role in RoleEnum}
+
+users_to_create = [
+    {"username": "SYSTEM", "role_enum": RoleEnum.SYSTEM, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
+    {"username": "Admin", "role_enum": RoleEnum.ADMIN, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
+    {"username": "Guest", "role_enum": RoleEnum.GUEST, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
+]
 
 
 def ensure_database_exists():
@@ -20,13 +37,13 @@ def ensure_roles_exist():
     db: Session = next(get_db())
     try:
         existing_roles = {role.name for role in db.query(Role).all()}
-        required_roles = {"admin", "user", "guest"}
-        missing_roles = required_roles - existing_roles
+        missing_roles = roles_to_create - existing_roles
 
-        for role_name in missing_roles:
-            role = Role(name=role_name)
-            db.add(role)
-            print(f"Rolle '{role_name}' hinzugefügt.")
+        for role_name in RoleEnum:
+            if role_name.value not in existing_roles:
+                role = Role(name=role_name.value)
+                db.add(role)
+                print(f"Rolle '{role_name.value}' hinzugefügt.")
 
         if missing_roles:
             db.commit()
@@ -38,36 +55,35 @@ def ensure_roles_exist():
         db.close()
 
 
-def ensure_user_exists():
-    """Stellt sicher, dass ein Benutzer mit dem Namen 'Guest' existiert."""
-    print("Überprüfe, ob der Benutzer 'Guest' existiert...")
+def ensure_users_exist():
+    """Stellt sicher, dass die Benutzer 'SYSTEM', 'Admin' und 'Guest' existieren."""
+    print("Überprüfe, ob die Benutzer 'SYSTEM', 'Admin' und 'Guest' existieren...")
     db: Session = next(get_db())
     try:
-        # Überprüfen, ob der Benutzer 'Guest' existiert
-        guest_user = db.query(User).filter(User.username == "Guest").first()
+        for user_info in users_to_create:
+            # Überprüfen, ob der Benutzer existiert
+            user = db.query(User).filter(User.username == user_info["username"]).first()
 
-        if not guest_user:
-            # Rolle für den Benutzer sicherstellen
-            guest_role = db.query(Role).filter(Role.name == "guest").first()
-            if not guest_role:
-                guest_role = Role(name="guest")
-                db.add(guest_role)
+            if not user:
+                # Rolle anhand von RoleEnum abrufen
+                role = db.query(Role).filter(Role.name == user_info["role_enum"].value).first()
+                if not role:
+                    raise ValueError(f"Rolle '{user_info['role_enum'].value}' existiert nicht in der Datenbank.")
+
+                # Benutzer erstellen
+                user = User(
+                    username=user_info["username"],
+                    role_id=role.id,
+                    rfid_key=None,
+                    created_by=user_info["created_by"],
+                    updated_by=user_info["updated_by"]
+                )
+                db.add(user)
                 db.commit()
-                db.refresh(guest_role)
-                print("Rolle 'guest' erstellt.")
-
-            # Benutzer 'Guest' erstellen
-            guest_user = User(
-                username="Guest",
-                role_id=guest_role.id,
-                rfid_key=None
-            )
-            db.add(guest_user)
-            db.commit()
-            print("Benutzer 'Guest' erstellt.")
-        else:
-            print("Benutzer 'Guest' existiert bereits.")
+                print(f"Benutzer '{user_info['username']}' erstellt.")
+            else:
+                print(f"Benutzer '{user_info['username']}' existiert bereits.")
     except Exception as e:
-        print(f"Fehler beim Überprüfen oder Erstellen des Benutzers 'Guest': {e}")  # noqa: E501
+        print(f"Fehler beim Überprüfen oder Erstellen der Benutzer: {e}")
     finally:
         db.close()
