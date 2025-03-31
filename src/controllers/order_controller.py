@@ -14,7 +14,7 @@ class OrderController:
                 product_id=product_id,
                 quantity=quantity,
                 created_by=created_by,
-                updated_by=created_by  # Initially set to the creator
+                updated_by=created_by
             )
             db.add(new_order)
             db.commit()
@@ -61,12 +61,11 @@ class OrderController:
                 print(f"Bestellung mit ID {order_id} nicht gefunden.")
                 return None
 
-            # Felder aktualisieren
             for key, value in kwargs.items():
                 if hasattr(order, key):
                     setattr(order, key, value)
 
-            order.updated_by = updated_by  # Update the updated_by field
+            order.updated_by = updated_by
             db.commit()
             db.refresh(order)
             return order

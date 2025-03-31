@@ -1,25 +1,17 @@
-from enum import Enum
 from sqlalchemy.orm import Session
 from models.db_context import engine, Base, get_db
 from models.role import Role
 from models.user import User
 from models.product import Product
 from models.order import Order
+from utils import ROLES
 
-
-class RoleEnum(Enum):
-    SYSTEM = "system"
-    ADMIN = "admin"
-    USER = "user"
-    GUEST = "guest"
-
-
-roles_to_create = {role.value for role in RoleEnum}
+roles_to_create = {role.value for role in ROLES}
 
 users_to_create = [
-    {"username": "SYSTEM", "role_enum": RoleEnum.SYSTEM, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
-    {"username": "Admin", "role_enum": RoleEnum.ADMIN, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
-    {"username": "Guest", "role_enum": RoleEnum.GUEST, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
+    {"username": "SYSTEM", "role_enum": ROLES.system, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
+    {"username": "Admin", "role_enum": ROLES.admin, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
+    {"username": "Guest", "role_enum": ROLES.guest, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
 ]
 
 
@@ -39,7 +31,7 @@ def ensure_roles_exist():
         existing_roles = {role.name for role in db.query(Role).all()}
         missing_roles = roles_to_create - existing_roles
 
-        for role_name in RoleEnum:
+        for role_name in ROLES:
             if role_name.value not in existing_roles:
                 role = Role(name=role_name.value)
                 db.add(role)

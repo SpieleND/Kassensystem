@@ -1,11 +1,12 @@
 from tkinter import Tk, Frame
 import os
+from utils import ROLES, session  # Import the global session
 from views.admin_view import AdminView
 
 
 class MainView:
-    def __init__(self, session):
-        self.session = session
+    def __init__(self):
+        """Initialisiert die Hauptansicht."""
         self.root = Tk()
         self.root.title("Komponentenbasierte View")
         self.root.geometry(os.getenv("DISPLAY_RESOLUTION"))
@@ -13,7 +14,7 @@ class MainView:
         self.main_frame = Frame(self.root)
         self.main_frame.pack(fill="both", expand=True)
 
-        self.admin_view = AdminView(self.main_frame, self.session, self.logout)
+        self.admin_view = AdminView(self.main_frame, session, self.logout)
 
         # Standardansicht anzeigen
         self.admin_view.show_role_display()
@@ -23,11 +24,12 @@ class MainView:
 
     def enter_admin_mode(self, event=None):
         """Wechselt in den administrativen Bereich."""
+        session.set_user_by_id(ROLES.admin)
         self.admin_view.show_admin_menu()
 
     def logout(self):
         """Wechselt zurück in den Standardmodus."""
-        self.session.set_user(None)
+        session.set_user_by_id(ROLES.guest)
         self.admin_view.show_role_display()
 
     def run(self):
