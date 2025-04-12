@@ -3,9 +3,9 @@ from enum import Enum
 from models.session import Session
 
 class ROLES(Enum):
-    system = "SYSTEM"
-    admin = "admin"
-    user = "user"
-    guest = "guest"
+    SYSTEM = 1
+    admin = 2
+    user = 3
+    guest = 4
 
 session = Session()

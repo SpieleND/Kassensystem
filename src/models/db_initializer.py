@@ -7,13 +7,13 @@ from models.order import Order
 from utils import ROLES
 
 roles_to_create = [
-    {"name": role.value, "created_by": "SYSTEM", "updated_by": "SYSTEM"} for role in ROLES
+    {"name": role.name, "created_by": ROLES.SYSTEM.name, "updated_by": ROLES.SYSTEM.name} for role in ROLES
 ]
 
 users_to_create = [
-    {"username": "SYSTEM", "role_enum": ROLES.system, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
-    {"username": "Admin", "role_enum": ROLES.admin, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
-    {"username": "Guest", "role_enum": ROLES.guest, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
+    {"username": ROLES.SYSTEM.name, "role_enum": ROLES.SYSTEM.name, "created_by": ROLES.SYSTEM.name, "updated_by": ROLES.SYSTEM.name},
+    {"username": "Admin", "role_enum": ROLES.admin.name, "created_by": ROLES.SYSTEM.name, "updated_by": ROLES.SYSTEM.name},
+    {"username": "Guest", "role_enum": ROLES.guest.name, "created_by": ROLES.SYSTEM.name, "updated_by": ROLES.SYSTEM.name},
 ]
 
 
