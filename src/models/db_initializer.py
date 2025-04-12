@@ -60,9 +60,9 @@ def ensure_users_exist():
 
             if not user:
                 # Rolle anhand von RoleEnum abrufen
-                role = db.query(Role).filter(Role.name == user_info["role_enum"].name).first()
+                role = db.query(Role).filter(Role.name == user_info["role_enum"]).first()
                 if not role:
-                    raise ValueError(f"Rolle '{user_info['role_enum'].name}' existiert nicht in der Datenbank.")
+                    raise ValueError(f"Rolle '{user_info['role_enum']}' existiert nicht in der Datenbank.")
 
                 # Benutzer erstellen
                 user = User(
