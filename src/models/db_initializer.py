@@ -6,7 +6,9 @@ from models.product import Product
 from models.order import Order
 from utils import ROLES
 
-roles_to_create = {role.value for role in ROLES}
+roles_to_create = [
+    {"name": role.value, "created_by": "SYSTEM", "updated_by": "SYSTEM"} for role in ROLES
+]
 
 users_to_create = [
     {"username": "SYSTEM", "role_enum": ROLES.system, "created_by": "SYSTEM", "updated_by": "SYSTEM"},
@@ -29,13 +31,13 @@ def ensure_roles_exist():
     db: Session = next(get_db())
     try:
         existing_roles = {role.name for role in db.query(Role).all()}
-        missing_roles = roles_to_create - existing_roles
+        missing_roles = {role["name"] for role in roles_to_create} - existing_roles
 
-        for role_name in ROLES:
-            if role_name.value not in existing_roles:
-                role = Role(name=role_name.value)
+        for role_info in roles_to_create:
+            if role_info["name"] not in existing_roles:
+                role = Role(name=role_info["name"], created_by=role_info["created_by"], updated_by=role_info["updated_by"])
                 db.add(role)
-                print(f"Rolle '{role_name.value}' hinzugefügt.")
+                print(f"Rolle '{role_info['name']}' hinzugefügt.")
 
         if missing_roles:
             db.commit()

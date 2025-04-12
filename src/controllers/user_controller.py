@@ -144,7 +144,7 @@ class UserController:
                 return False
 
             user.is_deleted = True
-            user.updated_by = deleted_by  # Update the updated_by field
+            user.updated_by = deleted_by 
             db.commit()
             return True
         except Exception as e:
